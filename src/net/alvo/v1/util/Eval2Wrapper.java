@@ -79,9 +79,9 @@ public class Eval2Wrapper implements IAlvoPossible {
             }
 
             if (aa.equals("/sub")) {
-               AInt k = (AInt)rt.al.pop();
-               AInt l = (AInt)rt.al.pop();
-               rt.al.push(new AInt(l.my() - k.my()));
+               AInt kk = (AInt)rt.al.pop();
+               AInt ll = (AInt)rt.al.pop();
+               rt.al.push(new AInt(ll.my() - kk.my()));
                ctx.keeptrying = false;
                return;
             }
