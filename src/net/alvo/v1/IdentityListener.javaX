@@ -1,0 +1,125 @@
+/*
+ * Created by IntelliJ IDEA.
+ * User: olu
+ * Date: Sep 13, 2003
+ * Time: 11:39:11 AM
+ * To change template for new class use
+ * Code Style | Class Templates options (Tools | IDE Options).
+ */
+package net.alvo.v1;
+
+import antlr.collections.Stack;
+import antlr.collections.impl.LList;
+import net.alvo.util.UT;
+import net.alvo.v1.types.*;
+
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
+
+public class IdentityListener implements AlvoListener {
+	public void lazy(Lazy al) {
+		al.printlnM(pw);
+		UT.not_reached();
+	}
+
+	public void list(AList al) {
+		al.printlnM(pw);
+		UT.not_reached();
+	}
+
+	public void eval(AToken aToken, ExecutionContext ctx) {
+		(new AEval(aToken)).printlnM(pw);
+		final IRuntimeSink errstk = null;//new RuntimeSink();
+		ctx.rt().eval(aToken, cur, ctx, errstk);
+	}
+
+	public void ident(AToken at) {
+		String e=at.getText();
+		(new AIdent(at)).printlnM(pw);
+		cur.ident(at);
+	}
+
+	public void lazy_end() {
+		//~ ps.println("** lazy_end");
+		pw.println("}");
+		LazyAlvoListener ll = (LazyAlvoListener) lstack.pop();
+		cur.lazy((Lazy) ll.res());
+	}
+
+	public void lazy_start() {
+		//~ ps.println("{ --** lazy_start");
+		pw.println("{");
+		AlvoListener ll = new LazyAlvoListener();
+		lstack.push(ll);
+		cur = ll;
+	}
+
+	public void list_end() {
+		pw.println("** list_end");
+		ListAlvoListener ll = (ListAlvoListener) lstack.pop();
+		cur.list((AList) ll.res());
+	}
+
+	public void list_start() {
+		pw.println("** list_start");
+		AlvoListener ll = new ListAlvoListener();
+		lstack.push(ll);
+		cur = ll;
+	}
+
+	public void num_float(AToken e) {
+		pw.println("** num_float " + e);
+		cur.num_float(e);
+	}
+
+	public void num_int(AToken e) {
+		pw.println("** num_int " + e);
+		cur.num_int(e);
+	}
+
+	public void quote_last() {
+		pw.println("** quote_last ");
+		cur.quote_last();
+	}
+
+	public void string_lit(AToken e) {
+		pw.println("** string_lit " + e);
+		cur.string_lit(e);
+	}
+
+//	public void xident(String e) {
+//	public void xident(String e) {
+//		pw.println("** xident " + e);
+//		cur.xident(e);
+//	}
+
+	public IdentityListener(AlvoListener aCur, PrintStream aps) {
+		cur = aCur;
+		pw = new PrintWriter(new OutputStreamWriter(aps));
+	}
+
+	public IdentityListener(AlvoListener aCur, PrintWriter apw) {
+		cur = aCur;
+		pw = apw;
+	}
+
+	AlvoListener cur = null;
+	PrintWriter pw = null;
+	Stack lstack = new LList();
+
+	public AlvoObject pop() {
+		UT.not_reached();
+		return null;
+	}
+	public AlvoObject plusM(AlvoObject aRightSide) {
+		UT.not_reached();
+		return null;
+	}
+
+	public void push(AlvoObject anObject) {
+		UT.not_reached();
+
+	}
+
+}

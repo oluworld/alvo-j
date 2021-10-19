@@ -1,0 +1,21 @@
+/*
+ * Created on Mar 8, 2004
+ *
+ */
+package net.alvo.v1;
+
+//import junit.framework.TestCase;
+//
+///**
+// * @author olu
+// *
+// */
+//public class AEvalTest extends TestCase {
+//public void testPrintlnM() {
+//	//TODO Implement printlnM().
+//}
+//
+//public void testPlusM() {
+//	//TODO Implement plusM().
+//}
+//}

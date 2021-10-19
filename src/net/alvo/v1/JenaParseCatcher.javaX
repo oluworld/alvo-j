@@ -1,0 +1,259 @@
+/*
+ * Created on Mar 18, 2004
+ *
+ */
+package net.alvo.v1;
+
+import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+//
+//import org.apache.commons.collections.HashBag;
+//import org.apache.commons.collections.SortedBag;
+
+import net.alvo.util.Assert;
+import net.alvo.util.Pair;
+
+import com.hp.hpl.mesa.rdf.jena.bdb.ModelBdb;
+import com.hp.hpl.mesa.rdf.jena.bdb.StoreBdbF;
+//import com.hp.hpl.mesa.rdf.jena.common.PropertyImpl;
+import com.hp.hpl.mesa.rdf.jena.mem.ModelMem;
+import com.hp.hpl.mesa.rdf.jena.model.*;
+import com.hp.hpl.mesa.rdf.jena.sample.H;
+import com.hp.hpl.mesa.rdf.jena.sample.X;
+import com.hp.hpl.mesa.rdf.jena.vocabulary.RDF;
+
+
+public class JenaParseCatcher extends AParseCatcher {
+
+	public void lazy_start(AToken aToken) {
+		String id=alloc_rdf_id();
+		{
+			Resource resource = _resource_from_id(id);
+			ap(resource, AlvoRdf.type, "LAZY");
+			//final List l= anObject.rdfContent(myModel);
+		}
+		Pair e= Pair.make(base, new Integer(n));
+		zstack.push(e);
+		base= id;
+		n= 0;
+//		cur = lpc;
+		push(aToken);
+	}
+
+	private Resource _resource_from_id(String id) {
+		try {
+			return resource_from_idstr(id);
+		} catch (RDFException e1) {
+			Assert.not_reached();
+			return null;
+		}
+	}
+
+	public void lazy_end(AToken aToken) {
+//		ParseCatcher lpc = cur;
+		push(aToken); // TODO: add count
+		ap("#count", n);
+		Pair e = (Pair)zstack.pop();
+		base= (String) e.first;
+		n= ((Integer)e.second).intValue();
+//		myModel.add(myModel.createResource(sid), AlvoRdf.make_prop("#lazy-start"), 1);
+		//
+//		final AToken object = (AToken) zstack.pop();
+//		final Lazy lazy = new Lazy( ((AParseCatcher)lpc).v, object, aToken);
+//		cur.push(lazy);
+	}
+
+	private void ap(String aString, int aI) {
+		ap(last_resource, AlvoRdf.make_prop(aString), aI);
+	}
+	private void ap(Resource aResource, Property aProperty, String aString) {
+		try {
+			aResource.addProperty(aProperty, aString);
+		} catch (RDFException e) {
+			// TODO: ALVO:error
+			Assert.not_reached();
+			e.printStackTrace();
+		}
+	}
+	private void ap(Resource aResource, Property aProperty, int aI) {
+		try {
+			aResource.addProperty(aProperty, aI);
+		} catch (RDFException e) {
+			// TODO: ALVO:error
+			Assert.not_reached();
+			e.printStackTrace();
+		}
+	}
+
+static int m=0;
+int n=0;
+
+String base;
+Model myModel;
+
+static CAlvoRdf AlvoRdf = new CAlvoRdf();
+
+	public JenaParseCatcher(String aBase, Model aModel) {
+		base    = (aBase  !=null) ? aBase : "jpsc"+m++;
+		myModel = (aModel !=null) ? aModel : aa();
+		//
+		cur     = new DParseCatcher();//base, myModel);
+	}
+
+private Model aa() {
+	if (false) {
+		StoreBdbF bf = new StoreBdbF("jpc-base", "rdfstore");
+		try {
+			final ModelBdb model = new ModelBdb(bf);
+			return model;
+		} catch (RDFException e) {
+//			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	return new ModelMem();
+}
+
+private void print_statements() throws RDFException {
+	// TODO: sort this shit
+	StmtIterator stmtiterator = myModel.listStatements();
+	System.out.println("Statements in the model:");
+//	HashBag bag = new HashBag();
+	while (stmtiterator.hasNext()) {
+		final Resource x = stmtiterator.next();
+//		bag.add(x);
+		System.out.println(x);
+	}
+//	SortedBag sab= new SortedBag(bag);
+	System.out.println();
+}
+
+Resource last_resource;
+
+class Push {
+	final static int NORMAL=0;
+	final int LST=2;
+	final int LEND=3;
+	
+	private AlvoObject theObject;
+	private int nature;
+	public Push(AlvoObject anObject, int n) {
+		theObject=anObject;
+		nature=n;
+	}
+	public void push() {
+	try {
+		push1(theObject);
+		push2(resource, iter);
+		push3(resource);
+	} catch (RDFException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}}
+	
+	Resource resource;
+	Iterator iter;
+	
+	public void push1(AlvoObject anObject) throws RDFException {
+//		v.add(at);
+		// TODO: override type to say LAZY instead of TOKEN, and fix accordingly
+		//
+		final String str = alloc_rdf_id();
+		resource = resource_from_idstr(str);
+		final List l= anObject.rdfContent(myModel);
+		iter= l.iterator();
+	}
+	private void push3(final Resource aResource) throws RDFException {
+		last_resource= aResource;
+		print_statements();
+	}
+	private void push2(final Resource aResource, final Iterator iter) throws RDFException {
+		if (nature==NORMAL) push2_NORMAL(aResource, iter);
+		else if (nature==LST) push2_LST(aResource, iter);
+		else if (nature==LEND) push2_LEND(aResource, iter);
+		else Assert.not_reached();
+	}
+	private void push2_LEND(Resource aResource, Iterator aIter) {
+		Assert.not_implemented();
+	}
+	private void push2_LST(Resource aResource, Iterator aIter) {
+		Assert.not_implemented();
+	}
+	private void push2_NORMAL(final Resource aResource, final Iterator iter) throws RDFException {
+		//
+		while (iter.hasNext()) {
+			final Pair element = (Pair) iter.next();
+			//
+			final Property property = property_from_name((String) element.first);
+			myModel.add(aResource, property, element.second);
+		}
+	}
+	
+}
+
+public void push(AlvoObject anObject) {
+	new Push(anObject,Push.NORMAL).push();
+}
+
+private Property property_from_name(final String s) {
+	return AlvoRdf.make_prop(s);
+}
+
+private Resource resource_from_idstr(final String str) throws RDFException {
+	return myModel.createResource(str);
+}
+
+private String alloc_rdf_id() {
+	return base+"/"+n++;
+}
+
+public class Sample1b {
+
+public void main(String args[]) {
+	try {
+		sample1(aa());
+	} catch (Exception exception) {
+		System.out.println("Failed: " + exception);
+	}
+}
+
+void sample1(Model model)
+		throws RDFException {
+	NodeIterator nodeiterator = null;
+	StmtIterator stmtiterator = null;
+	Resource resource = model.createResource()
+			.addProperty(RDF.type, H.Rating)
+			.addProperty(RDF.value, 0.75D)
+			.addProperty(H.about, model.createResource("uri for album", X.Work));
+	Resource resource1 = model.createResource("URI for person")
+			.addProperty(RDF.type, H.Person)
+			.addProperty(H.ratings, model.createBag().add(resource));
+	stmtiterator = model.listStatements();
+	System.out.println("Statements in the model:");
+	while (stmtiterator.hasNext()) {
+		final Resource x = stmtiterator.next();
+		System.out.println(x);
+	}
+	System.out.println();
+	double d = resource1
+			.getProperty(H.ratings)
+			.getProperty(RDF.li(1))
+			.getProperty(RDF.value).getDouble();
+	resource1
+			.getProperty(H.ratings)
+			.getProperty(RDF.li(1))
+			.getProperty(RDF.value).set(d + 0.10000000000000001D);
+	nodeiterator = resource1.getProperty(H.ratings).getBag().iterator();
+	System.out.println();
+	while (nodeiterator.hasNext())
+		System.out.println("Rating = " + ((Resource) nodeiterator.next()).getProperty(RDF.value).getDouble()) ;
+	try {
+		model.write(new PrintWriter(System.out));
+	} catch (Exception exception) {
+		System.out.println(exception);
+	}
+}
+}
+}

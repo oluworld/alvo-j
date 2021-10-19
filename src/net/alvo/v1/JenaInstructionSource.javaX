@@ -1,0 +1,91 @@
+/*
+ * Created on Apr 17, 2004
+ *
+ */
+package net.alvo.v1;
+
+import java.util.Iterator;
+
+import net.alvo.util.Assert;
+
+import com.hp.hpl.jena.rdf.query.*;
+import com.hp.hpl.mesa.rdf.jena.model.*;
+
+public class JenaInstructionSource implements InstructionSource {
+
+Model m;
+Query query;
+String nn;
+Iterator iter;
+private CAlvoRdf AlvoRdf=new CAlvoRdf();
+private QueryResults results;
+private String thetype;
+private FakeResource fakeres;
+
+public JenaInstructionSource(Model aModel, String base) {
+	m=  aModel;
+	nn= base;
+
+	fakeres = new FakeResource(base, m);
+	thetype = fakeres.typeString();
+}
+
+private QueryResults do_query(String base, String aQueryString) {
+	query = new Query(aQueryString);
+	query.setSource(m);
+	
+	QueryExecution qe = new QueryEngine(query);
+	return qe.exec();
+}
+
+public AlvoObject next() {
+	AlvoObject R=null;
+	if (iter==null) return null;
+	if (!iter.hasNext()) {
+		if (results!=null) results.close();
+		/*return R;*/
+	} else {
+	
+	    if (true) {
+	    	if (thetype.equals("IDENT")) {
+	    		String s=fakeres.getProp("#text");
+	    	}
+	    		
+	    } else {
+		    ResultBinding res = (ResultBinding)iter.next();
+		    Literal x         = (Literal)res.get("x");
+		    //
+		    System.out.println("x = "+x) ;
+		    //
+		    
+		    String typename=null;
+			try {
+				typename = x.getString();
+			} catch (RDFException e) {
+				Assert.not_reached();
+			}
+			if (typename.equals("IDENT")) {
+				
+				RDFNode a2=x;
+		    	RDFNode a1=AlvoRdf.make_prop("#text");
+		    	//
+		    	Iterator i= do_query(nn, sm(a1, a2));
+		    	if (i==null || !i.hasNext()) {
+		    		//err();
+		    		Assert.not_reached();
+		    	} else {
+		    		String string = ""+((ResultBinding)i.next()).get("x");
+		    		R=new AIdent(new AToken(string, -1, -1));
+		    	}
+		    }
+		}
+	}
+	return R;	    
+}
+
+private String sm(RDFNode aa1, RDFNode aa2) {
+	String a1="<" + aa1 + ">";
+	String a2="<" + aa2 + ">";
+	return "SELECT ?x WHERE ("+a1+", "+a2+", ?x)";
+}
+}

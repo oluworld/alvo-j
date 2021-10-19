@@ -1,0 +1,33 @@
+/*
+ * Created on Mar 9, 2004
+ *
+ */
+package net.alvo.vis;
+/*
+import net.alvo.v1.*;
+import net.alvo.util.Assert;
+
+public class VisListener extends DefaultAlvoListener {
+	private VisPanel2 p;
+	
+	public VisListener(VisPanel2 ap) {
+		p= ap;
+	}
+	
+	public void eval(AEvalableToken at, ExecutionContext ctx) {
+		final IRuntimeSink errstk = null;//new RuntimeSink();
+		ctx.eval(at, this, errstk);
+	}
+	
+	public void push(AlvoObject a) {
+		Assert.precondition("a != null", a != null);
+		s.push(a);
+		p.stack.push(a);
+	}
+	
+	public AlvoObject pop() {
+		p.stack.pop();
+		return (AlvoObject) s.pop();
+	}
+}
+*/
