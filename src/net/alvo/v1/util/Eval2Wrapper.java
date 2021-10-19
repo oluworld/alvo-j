@@ -84,15 +84,8 @@ public class Eval2Wrapper implements IAlvoPossible {
 					return;
 				}
 
-				Lazy F;
-				if (this.myRt.has_method(g)) {
-					F = rt.getFunction(g, ctx);
-					if (F != null) {
-						InstructionSource source = ctx.InstructionSourceFor(F);
-						(new LazyRunner(source, rt, ctx)).runit();
-						ctx.keeptrying = false;
-						return;
-					}
+				if (run_method_if_present_in_runtime(ctx, myRt, g)) {
+					return;
 				} else {
 					if (aa.equals("/ifdef")) {
 						k = rt.al.pop();
@@ -134,7 +127,7 @@ public class Eval2Wrapper implements IAlvoPossible {
 							return;
 						}
 
-						F = this.myRt.getFunction(aa.substring(1), ctx);
+						Lazy F = this.myRt.getFunction(aa.substring(1), ctx);
 						Assert.not_reached();
 					}
 				}
@@ -148,6 +141,19 @@ public class Eval2Wrapper implements IAlvoPossible {
 		Assert.postcondition("not R", true);
 		Assert.postcondition("not R implies err != null", aCl.eval_failure != null);
 		ctx.keeptrying = true;
+	}
+
+	private boolean run_method_if_present_in_runtime(final ExecutionContext ctx, final AlvoRuntime aRt, final String aMethodName) {
+		if (!(aRt.has_method(aMethodName))) return false;
+
+		Lazy F = aRt.getFunction(aMethodName, ctx);
+		if (F == null)
+			return false;
+
+		InstructionSource source = ctx.InstructionSourceFor(F);
+		(new LazyRunner(source, aRt, ctx)).runit();
+		ctx.keeptrying = false;
+		return true;
 	}
 
 	void fallthru() {
