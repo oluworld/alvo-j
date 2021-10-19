@@ -1,0 +1,13 @@
+
+Prelude /open
+
+{ /write } w /def
+
+{ /dup 0 /eq
+	1
+	{ 1 n /sub /fac n /mult } /ifelse
+} fac /def
+10 /fac /w
+/newline
+3628800 10 /fac /eq /assert
+
