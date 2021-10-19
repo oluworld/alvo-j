@@ -73,9 +73,20 @@ public class ExecutionContext {
       this.inject(new AToken(anEvalName, -1, -1), anObjects, (IRuntimeSink)this.rt().al);
    }
 
+   DebuggingInstructionSource debuggingInstructionSource = null;
+
    public InstructionSource InstructionSourceFor(AInstructionable anInstructionList) {
       InstructionSource R = new LazyInstructionSource(anInstructionList);
-      return (InstructionSource)(this.debugging ? new DebuggingInstructionSource(R) : R);
+      if (this.debugging) {
+         if (debuggingInstructionSource == null) {
+            debuggingInstructionSource = new DebuggingInstructionSource(R);
+            return debuggingInstructionSource;
+         } else {
+            final DerivedDebuggingSource derivedDebuggingSource = new DerivedDebuggingSource(debuggingInstructionSource, R);
+            return derivedDebuggingSource;
+         }
+      }
+      return R;
    }
 
    public void load_resource(String uri, Reader aCharStream) throws Exception {
