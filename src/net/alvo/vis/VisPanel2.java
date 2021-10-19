@@ -195,8 +195,6 @@ public class VisPanel2 extends JPanel {
 
    private class ErrViewTableModel implements TableModel {
       private Vector ll = new Vector();
-      // $FF: synthetic field
-      static Class class$0;
 
       ErrViewTableModel() {
       }
