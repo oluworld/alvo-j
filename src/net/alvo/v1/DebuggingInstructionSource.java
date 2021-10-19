@@ -16,6 +16,7 @@ public class DebuggingInstructionSource implements InstructionSource {
       } catch (InterruptedException var3) {
       }
 
-      return this.src.next();
+      final IAlvoRV next = this.src.next();
+      return next;
    }
 }
