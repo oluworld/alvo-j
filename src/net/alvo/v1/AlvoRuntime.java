@@ -32,7 +32,7 @@ public class AlvoRuntime implements IAlvoPossibleTarget, IRuntimeSink {
    private Object parentObject;
    AlvoParser parser;
    private Vector paths;
-   protected final List possibles;
+   protected final List<IAlvoPossible> possibles;
 
    public static AlvoObject typeCheck(ExecutionContext ctx, String aTypeName, AlvoObject aObject) {
       AlvoObject R = null;
@@ -269,10 +269,10 @@ public class AlvoRuntime implements IAlvoPossibleTarget, IRuntimeSink {
 
    void tryPossibles(AEvalableToken aet, ExecutionContext ctx) {
       Assert.precondition("same runtime", ctx.rt() == this);
-      Iterator i = this.possibles.iterator();
+      Iterator<IAlvoPossible> i = this.possibles.iterator();
 
       while(i.hasNext()) {
-         IAlvoPossible h = (IAlvoPossible)((IAlvoPossible)i.next());
+         IAlvoPossible h = i.next();
          h.eval(aet, ctx);
          if (!ctx.keeptrying) {
             return;
