@@ -151,7 +151,8 @@ public class VisPanel extends JPanel {
    }
 
    protected void step_ActionPerformed(ActionEvent event) {
-      ais.permission.step();
+      if (ais != null)
+         ais.permission.step();
    }
 
    private void go_ActionPerformed(ActionEvent event) {
