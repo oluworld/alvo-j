@@ -3,9 +3,9 @@ package net.alvo.v1;
 import java.io.Reader;
 
 public interface Resource {
-   Reader getText();
+	Reader getText();
 
-   String getLocation();
+	String getLocation();
 
-   InstructionSource getResult(ExecutionContext var1) throws AlvoException;
+	InstructionSource getResult(ExecutionContext var1) throws AlvoException;
 }

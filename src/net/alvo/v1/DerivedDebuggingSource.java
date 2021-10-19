@@ -18,7 +18,7 @@ public class DerivedDebuggingSource implements InstructionSource {
 	@Override
 	public IAlvoRV next() {
 		try {
-			synchronized(derived.permission) {
+			synchronized (derived.permission) {
 				derived.permission.wait();
 			}
 		} catch (InterruptedException var3) {

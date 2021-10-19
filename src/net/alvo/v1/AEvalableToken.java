@@ -1,7 +1,7 @@
 package net.alvo.v1;
 
 public interface AEvalableToken {
-   AToken getToken();
+	AToken getToken();
 
-   String tokenText();
+	String tokenText();
 }
